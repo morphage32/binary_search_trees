@@ -215,8 +215,58 @@ class Tree
     return values unless block_given?
   end
 
+  def height(current_node = @root, node_count = 0)
+    unless current_node.nil?
+      node_count += 1
+    end
+
+    if current_node.left.nil? && current_node.right.nil?
+      return node_count
+    end
+
+    left = 0
+    right = 0
+
+    unless current_node.left.nil?
+      left += height(current_node.left, node_count)
+    end
+    
+    unless current_node.right.nil?
+      right += height(current_node.right, node_count)
+    end
+
+    left > right ? left : right
+  end
+
+  def depth(given_node = @root, current_node = @root, node_count = 0)
+    node_count += 1
+
+    if given_node.data == current_node.data
+      return node_count
+    elsif given_node.data < current_node.data
+      return depth(given_node, current_node.left, node_count)
+    else
+      return depth(given_node, current_node.right, node_count)
+    end
+      
+  end
+
+  def balanced?(root_node = @root)
+    if (height(root_node.left) - height(root_node.right) >= -1) &&
+      (height(root_node.left) - height(root_node.right) <= 1)
+      return true
+    end
+    return false
+  end
+
 end
 
 my_tree = Tree.new([8,7,14,3,8,1,13,2,4,9,10,12,5,15,10,6,11,3])
 my_tree.pretty_print
-puts my_tree.postorder
+puts "Balanced tree: #{my_tree.balanced?}"
+my_tree.insert(16)
+my_tree.pretty_print
+puts "Balanced tree: #{my_tree.balanced?}"
+my_tree.insert(17)
+my_tree.pretty_print
+puts "Balanced tree: #{my_tree.balanced?}"
