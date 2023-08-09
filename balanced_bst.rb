@@ -259,14 +259,31 @@ class Tree
     return false
   end
 
+  def rebalance(root_node = @root)
+    if balanced?(root_node)
+      puts "The tree is already balanced."
+      return
+    end
+
+    node_array = inorder(root_node)
+    build_tree(node_array)
+
+    puts "Tree successfully rebalanced!"
+  end
+
 end
 
 my_tree = Tree.new([8,7,14,3,8,1,13,2,4,9,10,12,5,15,10,6,11,3])
 my_tree.pretty_print
 puts "Balanced tree: #{my_tree.balanced?}"
 my_tree.insert(16)
+my_tree.insert(17)
+my_tree.insert(18)
+my_tree.insert(19)
+my_tree.insert(20)
+my_tree.insert(21)
 my_tree.pretty_print
 puts "Balanced tree: #{my_tree.balanced?}"
-my_tree.insert(17)
+my_tree.rebalance
 my_tree.pretty_print
 puts "Balanced tree: #{my_tree.balanced?}"
