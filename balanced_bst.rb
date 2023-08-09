@@ -17,8 +17,13 @@ class Tree
     build_tree(@nodelist)
   end
 
+  def pretty_print(node = @root, prefix = '', is_left = true)
+    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
+    puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
+    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
+  end
+
   def build_tree(array = @nodelist)
-    # sort array and remove duplicates
     array = sort_nodelist(array)
     @root = build_nodes(array, 0, array.length - 1)
 
@@ -65,13 +70,153 @@ class Tree
     end
 
     middle = (first + last) / 2
-    root_node = Node.new(array[middle])
-    root_node.left = build_nodes(array, first, middle - 1)
-    root_node.right = build_nodes(array, middle + 1, last)
+    current_node = Node.new(array[middle])
+    current_node.left = build_nodes(array, first, middle - 1)
+    current_node.right = build_nodes(array, middle + 1, last)
 
-    return root_node
+    return current_node
   end
+
+  def insert(value, current_node = nil)
+    if current_node == nil
+      current_node = @root
+    end
+
+    if current_node.data == value
+      puts "#{value} already exists in tree."
+      return
+    end
+
+    if current_node.data < value
+      if current_node.right.nil?
+        current_node.right = Node.new(value)
+        puts "#{value} added to tree."
+        return current_node.right
+      else
+        insert(value, current_node.right)
+      end
+    else
+      if current_node.left.nil?
+        current_node.left = Node.new(value)
+        puts "#{value} added to tree."
+        return current_node.left
+      else
+        insert(value, current_node.left)
+      end
+    end
+  end
+
+  def delete(value, current_node = @root)
+
+    if current_node.data < value
+      current_node.right = delete(value, current_node.right)
+      return current_node
+    elsif current_node.data > value
+      current_node.left = delete(value, current_node.left)
+      return current_node
+    end
+
+    if current_node.left.nil?
+      return current_node.right
+    elsif current_node.right.nil?
+      return current_node.left
+    end
+
+    target_node = current_node
+    replacement_node = current_node.right
+
+    until replacement_node.left.nil?
+      target_node = current_node.right
+      replacement_node = replacement_node.left
+    end
+
+    unless target_node == current_node
+      target_node.left = replacement_node.right
+    else
+      target_node.right = replacement_node.right
+    end
+
+    current_node.data = replacement_node.data
+
+    return current_node
+  end
+
+  def find(value, current_node = @root)
+    if current_node.data == value
+      return current_node
+    elsif current_node.right.nil?.! && current_node.data < value
+      return find(value, current_node.right)
+    elsif current_node.left.nil?.! && current_node.data > value
+      return find(value, current_node.left)
+    end
+
+    puts "#{value} not found in tree."
+  end
+
+  def level_order()
+    queue = [@root]
+    values = []
+    current_node = @root
+
+    until queue.empty?
+      current_node = queue.first
+      if block_given?
+        yield(current_node)
+      end
+
+      values.push(current_node.data)
+
+      unless current_node.left.nil?
+        queue.push(current_node.left)
+      end
+
+      unless current_node.right.nil?
+        queue.push(current_node.right)
+      end
+
+      queue.shift
+    end
+
+    unless block_given?
+      return values
+    end
+  end
+
+  def inorder(current_node = @root, values = [], &block)
+    return if current_node.nil?
+
+    inorder(current_node.left, values, &block)
+    yield(current_node) if block_given?
+    values.push(current_node.data)
+    inorder(current_node.right, values, &block)
+
+    return values unless block_given?
+  end
+
+  def preorder(current_node = @root, values = [], &block)
+    return if current_node.nil?
+
+    yield(current_node) if block_given?
+    values.push(current_node.data)
+    preorder(current_node.left, values, &block)
+    preorder(current_node.right, values, &block)
+
+    return values unless block_given?
+  end
+
+  def postorder(current_node = @root, values = [], &block)
+    return if current_node.nil?
+
+    postorder(current_node.left, values, &block)
+    postorder(current_node.right, values, &block)
+    yield(current_node) if block_given?
+    values.push(current_node.data)
+
+    return values unless block_given?
+  end
+
 end
 
-my_tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-puts my_tree.root.data
+my_tree = Tree.new([8,7,14,3,8,1,13,2,4,9,10,12,5,15,10,6,11,3])
+my_tree.pretty_print
+puts my_tree.postorder
