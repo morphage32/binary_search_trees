@@ -17,12 +17,6 @@ class Tree
     build_tree(@nodelist)
   end
 
-  def pretty_print(node = @root, prefix = '', is_left = true)
-    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
-    puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
-    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
-  end
-
   def build_tree(array = @nodelist)
     array = sort_nodelist(array)
     @root = build_nodes(array, 0, array.length - 1)
@@ -273,17 +267,23 @@ class Tree
 
 end
 
-my_tree = Tree.new([8,7,14,3,8,1,13,2,4,9,10,12,5,15,10,6,11,3])
-my_tree.pretty_print
-puts "Balanced tree: #{my_tree.balanced?}"
-my_tree.insert(16)
-my_tree.insert(17)
-my_tree.insert(18)
-my_tree.insert(19)
-my_tree.insert(20)
-my_tree.insert(21)
-my_tree.pretty_print
-puts "Balanced tree: #{my_tree.balanced?}"
-my_tree.rebalance
-my_tree.pretty_print
-puts "Balanced tree: #{my_tree.balanced?}"
+# driver script here
+
+mytree = Tree.new(Array.new(15) { rand(1..100) })
+mytree.balanced? ? (puts "Tree is balanced.") : (puts "Tree is not balanced.")
+puts "Elements in-order: #{mytree.inorder.to_s}"
+puts "Elements pre-ordered: #{mytree.preorder.to_s}"
+puts "Elements post-ordered: #{mytree.postorder.to_s}"
+puts "Elements in level-order: #{mytree.level_order.to_s}"
+puts "-----"
+15.times { mytree.insert(rand(101..200))}
+puts "-----"
+mytree.balanced? ? (puts "Tree is balanced.") : (puts "Tree is not balanced.")
+mytree.rebalance
+mytree.balanced? ? (puts "Tree is balanced.") : (puts "Tree is not balanced.")
+puts "Elements in-order: #{mytree.inorder.to_s}"
+puts "Elements pre-ordered: #{mytree.preorder.to_s}"
+puts "Elements post-ordered: #{mytree.postorder.to_s}"
+puts "Elements in level-order: #{mytree.level_order.to_s}"
+
+
